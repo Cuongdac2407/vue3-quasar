@@ -5,3 +5,10 @@ Screenshot:
 
 Mô tả:
 Đoạn mã Vue3 và Quasar tối giản sử dụng fetch/axios để gửi yêu cầu và in kết quả trả về. Video Demo
+
+Bài 2: Ứng dụng ChatBot cơ bản
+Mục tiêu: Xây dựng giao diện ChatBot cơ bản với ô nhập prompt và hiển thị kết quả AI.
+Screenshot:
+Video Demo
+Mô tả:
+Ứng dụng được xây dựng bằng Vue.js 3 và Quasar. Yêu cầu gọi API và hiển thị phản hồi trên giao diện.
