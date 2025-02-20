@@ -4,7 +4,7 @@
 Mục tiêu: khi video file ogg chạy thì file các từ trong hội thoại file json hiển thị theo giọng nói.
 
 Screenshot:
-
+https://github.com/user-attachments/assets/f65576de-f135-400c-9b0e-61f7fe282090
 Mô tả:
 Đoạn mã Vue3 và Quasar tối giản sử dụng fetch/axios để gửi yêu cầu và in kết quả trả về. Video Demo
 
@@ -13,6 +13,9 @@ Mục tiêu: Xây dựng giao diện ChatBot cơ bản với ô nhập prompt v�
 Screenshot:
 Video Demo
 Mô tả:
+https://github.com/user-attachments/assets/5a0c2d17-48fd-426e-90f0-40dabbf6a9f2
+
+
 Ứng dụng được xây dựng bằng Vue.js 3 và Quasar. Yêu cầu gọi API và hiển thị phản hồi trên giao diện.
 
 ## Bài 3: Cải tiến ChatBot
@@ -22,6 +25,8 @@ Screenshot:
 
 Video demo:
 [Video Demo]
+
+https://github.com/user-attachments/assets/0d8ca8cb-1ce6-477d-8a3e-8c720510a5c2
 
 Mô tả chi tiết:
 
