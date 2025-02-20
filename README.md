@@ -1,3 +1,5 @@
+## Video demo em để ở phần public/data video của bài nào em để trong folder public/data của các ex đó 
+
 ## Bài 1: lập trình để highlight từng từ khi file âm thanh được phát như hình dưới đây.
 Mục tiêu: khi video file ogg chạy thì file các từ trong hội thoại file json hiển thị theo giọng nói.
 
