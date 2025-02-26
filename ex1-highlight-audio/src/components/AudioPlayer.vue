@@ -11,7 +11,8 @@
       <div class="progress" :style="{ width: progressPercent + '%' }"></div>
     </div>
 
-    <p v-if="displaySentence">{{ displaySentence }}</p>
+    <!-- Sử dụng v-html để render câu với các thẻ span -->
+    <p v-if="displaySentence" v-html="displaySentence"></p>
   </div>
 </template>
 
@@ -19,14 +20,15 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 
-// Khai báo các biến reactive
 const audioRef = ref(null)
 const transcript = ref([])
 const currentWordIndex = ref(-1)
 const displaySentence = ref('')
 const offsetDelay = 800
 
-// Hàm load dữ liệu transcript từ JSON
+let updateTimeout = null // Biến lưu timeout để debounce
+
+// Hàm load transcript từ JSON
 const loadTranscript = async () => {
   try {
     const response = await axios.get('/data/jameslan.json')
@@ -46,10 +48,11 @@ const isPunctuation = (char) => {
   return ['.', '!', '?', '…'].includes(char)
 }
 
-// Hàm cập nhật câu hiển thị dựa trên currentWordIndex
+// Hàm cập nhật câu hiển thị với từ hiện tại được bọc trong span có class "highlight"
 const updateDisplayedSentence = (index) => {
   const words = transcript.value
   if (!words.length) return
+
   let startIndex = index
   while (startIndex > 0 && !isPunctuation(words[startIndex - 1].text)) {
     startIndex--
@@ -58,26 +61,35 @@ const updateDisplayedSentence = (index) => {
   while (endIndex < words.length - 1 && !isPunctuation(words[endIndex].text)) {
     endIndex++
   }
-  let sentence = ''
+
+  const sentenceArr = []
   for (let i = startIndex; i <= endIndex; i++) {
-    if (i > startIndex && !isPunctuation(words[i].text)) {
-      sentence += ' '
+    let word = words[i].text
+    if (i === index) {
+      // Bọc từ hiện tại trong span highlight
+      word = `<span class="highlight">${word}</span>`
     }
-    sentence += words[i].text
+    sentenceArr.push(word)
   }
-  displaySentence.value = sentence
+  displaySentence.value = sentenceArr.join(' ')
 }
 
-// Hàm đồng bộ highlight theo thời gian audio
+// Hàm đồng bộ chỉ số từ hiện tại dựa trên thời gian audio, sử dụng debounce 200ms
 const syncHighlight = () => {
   if (!audioRef.value) return
-  const currentTime = audioRef.value.currentTime * 1000 // chuyển giây sang ms
-  const index = transcript.value.findIndex(
-    (word) => currentTime >= word.start && currentTime <= word.end
+  const currentTime = audioRef.value.currentTime * 1000 // ms
+  const newIndex = transcript.value.findIndex(
+    (word) => currentTime >= word.start && currentTime <= word.end,
   )
-  if (index !== -1) {
-    currentWordIndex.value = index
-    updateDisplayedSentence(index)
+  if (newIndex === -1) return
+
+  if (newIndex !== currentWordIndex.value) {
+    if (updateTimeout) clearTimeout(updateTimeout)
+    updateTimeout = setTimeout(() => {
+      currentWordIndex.value = newIndex
+      updateDisplayedSentence(newIndex)
+      updateTimeout = null
+    }, 200)
   }
 }
 
@@ -87,41 +99,38 @@ const progressPercent = computed(() => {
   return (audioRef.value.currentTime / audioRef.value.duration) * 100
 })
 
-// Hàm xử lý phím tắt
+// Các phím tắt: p: pause/resume, s: stop, q: quit
 function handleKeyDown(event) {
-  if (!audioRef.value) return;
-  const key = event.key.toLowerCase();
+  if (!audioRef.value) return
+  const key = event.key.toLowerCase()
   if (key === 'p') {
-    // Pause/Resume
     if (audioRef.value.paused) {
-      audioRef.value.play();
-      console.log("Resumed audio");
+      audioRef.value.play()
+      console.log('Resumed audio')
     } else {
-      audioRef.value.pause();
-      console.log("Paused audio");
+      audioRef.value.pause()
+      console.log('Paused audio')
     }
   } else if (key === 's') {
-    // Stop: pause và reset currentTime về 0
-    audioRef.value.pause();
-    audioRef.value.currentTime = 0;
-    console.log("Stopped audio");
+    audioRef.value.pause()
+    audioRef.value.currentTime = 0
+    console.log('Stopped audio')
   } else if (key === 'q') {
-    // Quit: dừng audio, reset currentTime, xóa nội dung hiển thị
-    audioRef.value.pause();
-    audioRef.value.currentTime = 0;
-    displaySentence.value = "";
-    console.log("Quit audio");
+    audioRef.value.pause()
+    audioRef.value.currentTime = 0
+    displaySentence.value = ''
+    console.log('Quit audio')
   }
 }
 
 onMounted(() => {
-  loadTranscript();
-  document.addEventListener('keydown', handleKeyDown);
-});
+  loadTranscript()
+  document.addEventListener('keydown', handleKeyDown)
+})
 
 onBeforeUnmount(() => {
-  document.removeEventListener('keydown', handleKeyDown);
-});
+  document.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <style scoped>
@@ -133,7 +142,7 @@ onBeforeUnmount(() => {
   max-width: 800px;
   height: 400px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .aaa-image {
@@ -143,7 +152,7 @@ onBeforeUnmount(() => {
   margin: 0 auto 20px;
   display: block;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 audio {
@@ -172,5 +181,12 @@ p {
   margin: 20px;
   line-height: 1.6;
   color: #333;
+}
+
+/* Dùng deep selector để áp dụng style cho .highlight trong nội dung render qua v-html */
+:deep(.highlight) {
+  background-color: yellow;
+  padding: 2px 4px;
+  border-radius: 3px;
 }
 </style>

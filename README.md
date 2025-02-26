@@ -2,7 +2,10 @@
 
 ## Bài 1: lập trình để highlight từng từ khi file âm thanh được phát như hình dưới đây.
 Mục tiêu: khi video file ogg chạy thì file các từ trong hội thoại file json hiển thị theo giọng nói.
-
+-sử dụng Hàm load dữ liệu transcript từ JSON.
+-Hàm cập nhật câu hiển thị dựa trên currentWordIndex.
+-Hàm đồng bộ highlight theo thời gian audio.
+-Hàm xử lý phím tắt.
 Screenshot:
 https://github.com/user-attachments/assets/f65576de-f135-400c-9b0e-61f7fe282090
 Mô tả:
@@ -10,6 +13,7 @@ Mô tả:
 
 ## Bài 2: Ứng dụng ChatBot cơ bản
 Mục tiêu: Xây dựng giao diện ChatBot cơ bản với ô nhập prompt và hiển thị kết quả AI.
+
 Screenshot:
 Video Demo
 Mô tả:
